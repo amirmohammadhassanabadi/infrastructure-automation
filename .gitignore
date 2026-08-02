@@ -1,0 +1,19 @@
+# Generated reports
+reports/
+
+# Configuration backups
+backups/
+
+# Ansible retry files
+*.retry
+
+# Python
+__pycache__/
+*.pyc
+
+# IDEs
+.vscode/
+.idea/
+
+# macOS
+.DS_Store
