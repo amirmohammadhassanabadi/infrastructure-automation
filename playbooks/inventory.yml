@@ -1,0 +1,5 @@
+- name: Collect infrastructure inventory
+  hosts: linux
+  gather_facts: true
+  roles:
+  - os-reporter
