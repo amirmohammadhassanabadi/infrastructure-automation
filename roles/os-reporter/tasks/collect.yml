@@ -1,0 +1,7 @@
+- name: Collect OS pretty name
+  ansible.builtin.shell: |
+    . /etc/os-release && echo "$PRETTY_NAME"
+  args:
+    executable: /bin/sh
+  register: os_pretty_name
+  changed_when: false

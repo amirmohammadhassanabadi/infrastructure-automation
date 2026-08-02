@@ -1,0 +1,6 @@
+- name: Show collected information
+  ansible.builtin.debug:
+    msg:
+      hostname: "{{ ansible_hostname }}"
+      os: "{{ os_pretty_name.stdout }}"
+      kernel: "{{ ansible_kernel }}"
