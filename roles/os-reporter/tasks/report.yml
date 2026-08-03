@@ -1,6 +1,11 @@
-- name: Show collected information
-  ansible.builtin.debug:
-    msg:
-      hostname: "{{ ansible_hostname }}"
-      os: "{{ os_pretty_name.stdout }}"
-      kernel: "{{ ansible_kernel }}"
+- name: Ensure reports directory exists
+  delegate_to: localhost
+  ansible.builtin.file:
+    path: "{{ playbook_dir }}/../reports"
+    state: directory
+    mode: 0755
+- name: Generate text report
+  ansible.builtin.template:
+    src: report.txt.j2
+    dest: "{{ playbook_dir }}/../reports/{{ inventory_hostname }}.txt"
+  delegate_to: localhost
