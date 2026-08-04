@@ -2,4 +2,4 @@
   hosts: linux
   gather_facts: true
   roles:
-  - os-reporter
+  - os_report
