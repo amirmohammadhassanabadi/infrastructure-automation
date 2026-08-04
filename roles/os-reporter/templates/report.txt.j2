@@ -16,3 +16,8 @@ Model             : {{ cpu_model }}
 Sockets           : {{ ansible_facts.processor_count | default('N/A') }}
 Cores / Socket    : {{ ansible_facts.processor_cores | default('N/A') }}
 Logical CPUs      : {{ ansible_facts.processor_vcpus | default('N/A') }}
+
+Memory
+----------------
+Total RAM         : {{ '%.2f' | format(memory_total_mb / 1024 )}} GB
+Total Swap        : {{ '%.2f' | format(memory_swap_mb / 1024) }} GB

@@ -5,7 +5,7 @@
     executable: /bin/sh
   register: os_pretty_name
   changed_when: false
-  
+
 - name: Determine CPU model
   ansible.builtin.set_fact:
     cpu_model: >-
@@ -16,3 +16,8 @@
         | last
         | default('N/A')
       }}
+
+- name: Memory information
+  ansible.builtin.set_fact:
+    memory_total_mb: "{{ ansible_facts.memory_mb.real.total | default(0) }}"
+    memory_swap_mb: "{{ ansible_facts.memory_mb.swap.total | default(0) }}"
