@@ -5,3 +5,14 @@
     executable: /bin/sh
   register: os_pretty_name
   changed_when: false
+  
+- name: Determine CPU model
+  ansible.builtin.set_fact:
+    cpu_model: >-
+      {{
+        ansible_facts.processor
+        | select('string')
+        | reject('equalto', '')
+        | last
+        | default('N/A')
+      }}

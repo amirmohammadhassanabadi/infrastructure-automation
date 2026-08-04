@@ -3,9 +3,16 @@ Infrastructure Report
 
 Host Information
 ----------------
-Inventory Name : {{ inventory_hostname }}
-Hostname       : {{ ansible_hostname }}
-FQDN           : {{ ansible_fqdn }}
-Operating System : {{ os_pretty_name.stdout }}
-Kernel         : {{ ansible_kernel }}
-Architecture   : {{ ansible_architecture }}
+Inventory Name    : {{ inventory_hostname | default('N/A') }}
+Hostname          : {{ ansible_facts.hostname | default('N/A') }}
+FQDN              : {{ ansible_facts.fqdn | default('N/A') }}
+Operating System  : {{ os_pretty_name.stdout | default('N/A') }}
+Kernel            : {{ ansible_facts.kernel | default('N/A') }}
+Architecture      : {{ ansible_facts.architecture | default('N/A') }}
+
+CPU
+----------------
+Model             : {{ cpu_model }}
+Sockets           : {{ ansible_facts.processor_count | default('N/A') }}
+Cores / Socket    : {{ ansible_facts.processor_cores | default('N/A') }}
+Logical CPUs      : {{ ansible_facts.processor_vcpus | default('N/A') }}
