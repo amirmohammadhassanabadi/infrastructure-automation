@@ -1,0 +1,21 @@
+---
+- name: Gather service facts
+  ansible.builtin.service_facts:
+
+- name: Check if RKE2 binary exists
+  ansible.builtin.stat:
+    path: /usr/local/bin/rke2
+  register: rke2_binary
+
+- name: Initialize Kubernetes inventory variables
+  ansible.builtin.set_fact:
+    kubernetes_installed: false
+    kubernetes_distribution: "Not Installed"
+
+- name: Detect RKE2
+  ansible.builtin.set_fact:
+    kubernetes_installed: true
+    kubernetes_distribution: "RKE2"
+  when:
+    - rke2_binary.stat.exists
+    - "'rke2-server.service' in ansible_facts.services or 'rke2-agent.service' in ansible_facts.services"
