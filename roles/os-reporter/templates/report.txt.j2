@@ -2,7 +2,7 @@ Infrastructure Report
 =====================
 
 Host Information
-----------------
+------------------------------------------------------------------------------------------------
 Inventory Name    : {{ inventory_hostname | default('N/A') }}
 Hostname          : {{ ansible_facts.hostname | default('N/A') }}
 FQDN              : {{ ansible_facts.fqdn | default('N/A') }}
@@ -11,13 +11,28 @@ Kernel            : {{ ansible_facts.kernel | default('N/A') }}
 Architecture      : {{ ansible_facts.architecture | default('N/A') }}
 
 CPU
-----------------
+------------------------------------------------------------------------------------------------
 Model             : {{ cpu_model }}
 Sockets           : {{ ansible_facts.processor_count | default('N/A') }}
 Cores / Socket    : {{ ansible_facts.processor_cores | default('N/A') }}
 Logical CPUs      : {{ ansible_facts.processor_vcpus | default('N/A') }}
 
 Memory
-----------------
+------------------------------------------------------------------------------------------------
 Total RAM         : {{ '%.2f' | format(memory_total_mb / 1024 )}} GB
 Total Swap        : {{ '%.2f' | format(memory_swap_mb / 1024) }} GB
+
+Storage
+------------------------------------------------------------------------------------------------
+{% if mounted_filesystems | length == 0 %}
+No mounted filesystems found.
+{% else %}
+{% for mount in mounted_filesystems %}
+Mount Point       : {{ mount.mount }}
+Filesystem        : {{ mount.fstype }}
+Device            : {{ mount.device }}
+Total Size        : {{ (mount.size_total / 1073741824) | round(2)}} GB
+Available Space   : {{ (mount.size_available / 1073741824) | round(2) }} GB
+++++++++++++++++++
+{% endfor %}
+{% endif %}

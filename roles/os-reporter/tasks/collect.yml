@@ -17,7 +17,11 @@
         | default('N/A')
       }}
 
-- name: Memory information
+- name: Normalize memory information
   ansible.builtin.set_fact:
     memory_total_mb: "{{ ansible_facts.memory_mb.real.total | default(0) }}"
     memory_swap_mb: "{{ ansible_facts.memory_mb.swap.total | default(0) }}"
+
+- name: Normalize mounted filesystems
+  ansible.builtin.set_fact:
+    mounted_filesystems: "{{ ansible_facts.mounts | default([]) }}"
