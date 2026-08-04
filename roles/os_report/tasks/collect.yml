@@ -25,3 +25,23 @@
 - name: Normalize mounted filesystems
   ansible.builtin.set_fact:
     mounted_filesystems: "{{ ansible_facts.mounts | default([]) }}"
+
+- name: Build network interface list
+  ansible.builtin.set_fact:
+    network_interfaces: []
+
+- name: Collect network interface information
+  ansible.builtin.set_fact:
+    network_interfaces: "{{ network_interfaces + [interface_info] }}"
+  loop: "{{ ansible_facts.interfaces }}"
+  vars:
+    iface: "{{ ansible_facts[item] }}"
+    interface_info:
+      name: "{{ iface.device }}"
+      active: "{{ iface.active | default(false) }}"
+      type: "{{ iface.type | default('unknown') }}"
+      mtu: "{{ iface.mtu | default('N/A') }}"
+      mac: "{{ iface.macaddress | default('N/A') }}"
+      ipv4: "{{ iface.ipv4.address | default('N/A') }}"
+      ipv4_prefix: "{{ iface.ipv4.prefix | default('') }}"
+      ipv6: "{{ iface.ipv6 | default([]) }}"
