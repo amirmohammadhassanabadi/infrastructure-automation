@@ -1,5 +1,5 @@
 - name: Collect infrastructure inventory
-  hosts: linux
+  hosts: kuber
   gather_facts: true
   roles:
-  - os_report
+  - kubernetes_inventory 

@@ -19,3 +19,7 @@
   when:
     - rke2_binary.stat.exists
     - "'rke2-server.service' in ansible_facts.services or 'rke2-agent.service' in ansible_facts.services"
+
+- name: show report
+  ansible.builtin.debug:
+    msg: "kubernetes_installed: {{ kubernetes_installed }} - kubernetes_distribution: {{ kubernetes_distribution }}"
