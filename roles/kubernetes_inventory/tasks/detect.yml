@@ -1,25 +1,77 @@
 ---
+#Initializing the Dict
+- name: Initialize Kubernetes facts
+  ansible.builtin.set_fact:
+    kubernetes:
+      installed: false
+      distribution: "Not Installed"
+      version: ""
+      raw_version: ""
+      node_role: ""
+      components: []
+
+# Collect installed services
 - name: Gather service facts
   ansible.builtin.service_facts:
 
+# Check for RKE2 binary
 - name: Check if RKE2 binary exists
   ansible.builtin.stat:
     path: /usr/local/bin/rke2
   register: rke2_binary
 
-- name: Initialize Kubernetes inventory variables
+# Check whether kubelet exists
+- name: Check kubelet service
   ansible.builtin.set_fact:
-    kubernetes_installed: false
-    kubernetes_distribution: "Not Installed"
+    kubelet_exists: "{{ 'kubelet.service' in ansible_facts.services }}"
 
+# Check whether Docker exists
+- name: Check Docker service
+  ansible.builtin.set_fact:
+    docker_exists: "{{ 'docker.service' in ansible_facts.services }}"
+
+# Detect RKE2
 - name: Detect RKE2
   ansible.builtin.set_fact:
-    kubernetes_installed: true
-    kubernetes_distribution: "RKE2"
+    kubernetes: >-
+      {{
+        kubernetes | combine({
+          'installed': true,
+          'distribution': 'RKE2'
+        })
+      }}
   when:
     - rke2_binary.stat.exists
     - "'rke2-server.service' in ansible_facts.services or 'rke2-agent.service' in ansible_facts.services"
 
-- name: show report
-  ansible.builtin.debug:
-    msg: "kubernetes_installed: {{ kubernetes_installed }} - kubernetes_distribution: {{ kubernetes_distribution }}"
+# Detect RKE1 (heuristic)
+- name: Detect RKE1
+  ansible.builtin.set_fact:
+    kubernetes: >-
+      {{
+        kubernetes | combine({
+          'installed': true,
+          'distribution': 'RKE1'
+        })
+      }}
+  when:
+    - not kubernetes.installed
+    - kubelet_exists
+    - docker_exists
+
+# Kubernetes exists, but distribution is unknown
+- name: Detect unknown Kubernetes distribution
+  ansible.builtin.set_fact:
+    kubernetes: >-
+      {{ kubernetes | combine({
+          'installed': "false",
+          'distribution': "Unknown"
+        }) 
+      }}
+  when:
+    - not kubernetes.installed
+    - kubelet_exists
+
+- name: report
+  debug:
+    msg: "kubernetes_installed: {{ kubernetes.installed }} - distribution: {{ kubernetes.distribution }}"
