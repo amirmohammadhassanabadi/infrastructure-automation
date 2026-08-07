@@ -1,15 +1,15 @@
 ---
 - import_tasks: detect.yml
 
-# - import_tasks: version.yml
-#   when: kubernetes_installed
+- import_tasks: version.yml
+  when: kubernetes.installed
 
 # - import_tasks: node_role.yml
-#   when: kubernetes_installed
+#   when: kubernetes.installed
 
 # - import_tasks: components.yml
 #   when:
-#     - kubernetes_installed
+#     - kubernetes.installed
 #     - kubernetes_role == "Control Plane"
 
 # - import_tasks: report.yml

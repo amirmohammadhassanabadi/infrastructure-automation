@@ -1,5 +1,8 @@
 ---
-#Initializing the Dict
+# ============================================================================
+# Initialize Kubernetes facts
+# ============================================================================
+
 - name: Initialize Kubernetes facts
   ansible.builtin.set_fact:
     kubernetes:
@@ -10,68 +13,90 @@
       node_role: ""
       components: []
 
-# Collect installed services
+# ============================================================================
+# Gather system information
+# ============================================================================
+
 - name: Gather service facts
   ansible.builtin.service_facts:
 
-# Check for RKE2 binary
 - name: Check if RKE2 binary exists
   ansible.builtin.stat:
     path: /usr/local/bin/rke2
   register: rke2_binary
 
-# Check whether kubelet exists
-- name: Check kubelet service
-  ansible.builtin.set_fact:
-    kubelet_exists: "{{ 'kubelet.service' in ansible_facts.services }}"
-
-# Check whether Docker exists
-- name: Check Docker service
+- name: Check if Docker service exists
   ansible.builtin.set_fact:
     docker_exists: "{{ 'docker.service' in ansible_facts.services }}"
 
-# Detect RKE2
+- name: Check if kubelet systemd service exists
+  ansible.builtin.set_fact:
+    kubelet_service_exists: "{{ 'kubelet.service' in ansible_facts.services }}"
+
+- name: Check if kubelet Docker container exists
+  ansible.builtin.command: docker inspect kubelet
+  register: kubelet_container
+  failed_when: false
+  changed_when: false
+  when: docker_exists
+
+# ============================================================================
+# Detect whether Kubernetes exists
+# ============================================================================
+
+- name: Determine if Kubernetes is installed
+  ansible.builtin.set_fact:
+    kubernetes: >-
+      {{
+        kubernetes | combine({
+          'installed':
+            kubelet_service_exists or
+            (
+              docker_exists and
+              kubelet_container.rc == 0
+            )
+        })
+      }}
+
+# ============================================================================
+# Detect distribution
+# ============================================================================
+
 - name: Detect RKE2
   ansible.builtin.set_fact:
     kubernetes: >-
       {{
         kubernetes | combine({
-          'installed': true,
           'distribution': 'RKE2'
         })
       }}
   when:
+    - kubernetes.installed
     - rke2_binary.stat.exists
-    - "'rke2-server.service' in ansible_facts.services or 'rke2-agent.service' in ansible_facts.services"
+    - "'rke2-server.service' in ansible_facts.services or
+       'rke2-agent.service' in ansible_facts.services"
 
-# Detect RKE1 (heuristic)
 - name: Detect RKE1
   ansible.builtin.set_fact:
     kubernetes: >-
       {{
         kubernetes | combine({
-          'installed': true,
           'distribution': 'RKE1'
         })
       }}
   when:
-    - not kubernetes.installed
-    - kubelet_exists
+    - kubernetes.installed
     - docker_exists
+    - not rke2_binary.stat.exists
 
-# Kubernetes exists, but distribution is unknown
 - name: Detect unknown Kubernetes distribution
   ansible.builtin.set_fact:
     kubernetes: >-
-      {{ kubernetes | combine({
-          'installed': "false",
-          'distribution': "Unknown"
-        }) 
+      {{
+        kubernetes | combine({
+          'distribution': 'Unknown'
+        })
       }}
   when:
-    - not kubernetes.installed
-    - kubelet_exists
-
-- name: report
-  debug:
-    msg: "kubernetes_installed: {{ kubernetes.installed }} - distribution: {{ kubernetes.distribution }}"
+    - kubernetes.installed
+    - kubernetes.distribution == "Not Installed"
