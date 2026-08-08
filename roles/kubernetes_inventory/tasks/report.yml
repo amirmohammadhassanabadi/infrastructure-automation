@@ -7,7 +7,3 @@
       version: "{{ kubernetes.version | default('N/A') }}"
       node_roles: "{{ kubernetes.node_roles | default([]) }}"
       components: "{{ kubernetes.components | default([]) }}"
-
-- name: Show Kubernetes report data
-  ansible.builtin.debug:
-    var: kubernetes_report
