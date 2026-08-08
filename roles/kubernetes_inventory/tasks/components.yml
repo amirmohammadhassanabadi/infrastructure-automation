@@ -1,0 +1,79 @@
+---
+# ============================================================================
+# RKE2 components
+# ============================================================================
+
+- name: Check RKE2 control-plane component manifests
+  ansible.builtin.stat:
+    path: "/var/lib/rancher/rke2/agent/pod-manifests/{{ item }}"
+  loop:
+    - kube-apiserver.yaml
+    - kube-controller-manager.yaml
+    - kube-scheduler.yaml
+    - etcd.yaml
+  register: rke2_component_manifests
+  when: kubernetes.distribution == "RKE2"
+
+- name: Add RKE2 components
+  ansible.builtin.set_fact:
+    kubernetes: >-
+      {{
+        kubernetes | combine({
+          'components':
+            kubernetes.components +
+            (
+              [item.item | regex_replace('\.yaml$', '')]
+              if item.stat.exists
+              else []
+            )
+        })
+      }}
+  loop: "{{ rke2_component_manifests.results }}"
+  when:
+    - kubernetes.distribution == "RKE2"
+
+
+# ============================================================================
+# RKE1 components
+# ============================================================================
+
+- name: Check RKE1 control-plane components
+  ansible.builtin.command:
+    argv:
+      - docker
+      - ps
+      - --filter
+      - "name={{ item }}"
+      - --format
+      - "{{ '{{.Names}}' }}"
+  loop:
+    - kube-apiserver
+    - kube-controller-manager
+    - kube-scheduler
+    - etcd
+  register: rke1_components
+  changed_when: false
+  failed_when: false
+  when: kubernetes.distribution == "RKE1"
+
+- name: Add RKE1 components
+  ansible.builtin.set_fact:
+    kubernetes: >-
+      {{
+        kubernetes | combine({
+          'components':
+            kubernetes.components + [item.item]
+        })
+      }}
+  loop: "{{ rke1_components.results }}"
+  when:
+    - kubernetes.distribution == "RKE1"
+    - item.stdout | trim != ""
+
+# ============================================================================
+# Show detected components
+# ============================================================================
+
+- name: Show Kubernetes components
+  ansible.builtin.debug:
+    var: kubernetes
