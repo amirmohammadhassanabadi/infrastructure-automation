@@ -1,0 +1,37 @@
+Infrastructure Report
+=====================
+
+Host Information
+----------------
+Inventory Name    : {{ inventory_hostname }}
+Hostname          : {{ ansible_facts.hostname | default('N/A') }}
+FQDN              : {{ ansible_facts.fqdn | default('N/A') }}
+Operating System  : {{ os_pretty_name.stdout | default('N/A') }}
+Kernel            : {{ ansible_facts.kernel | default('N/A') }}
+Architecture      : {{ ansible_facts.architecture | default('N/A') }}
+
+Kubernetes
+----------
+Installed         : {{ kubernetes_report.installed | default(false) }}
+Distribution      : {{ kubernetes_report.distribution | default('N/A') }}
+Version           : {{ kubernetes_report.version | default('N/A') }}
+
+Node Roles
+----------
+{% if kubernetes_report.node_roles | default([]) | length > 0 %}
+{% for role in kubernetes_report.node_roles %}
+- {{ role }}
+{% endfor %}
+{% else %}
+- None
+{% endif %}
+
+Components
+----------
+{% if kubernetes_report.components | default([]) | length > 0 %}
+{% for component in kubernetes_report.components %}
+- {{ component }}
+{% endfor %}
+{% else %}
+- None
+{% endif %}

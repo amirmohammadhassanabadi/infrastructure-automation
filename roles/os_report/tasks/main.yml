@@ -1,4 +1,4 @@
 - name: Collect operating system information
   ansible.builtin.include_tasks: collect.yml
-- name: Generate report
-  ansible.builtin.include_tasks: report.yml
+# - name: Generate report
+#   ansible.builtin.include_tasks: report.yml

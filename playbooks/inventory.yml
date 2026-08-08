@@ -2,4 +2,6 @@
   hosts: kuber
   gather_facts: true
   roles:
-  - kubernetes_inventory 
+  - os_report
+  - kubernetes_inventory
+  - report_generator

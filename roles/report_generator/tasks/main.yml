@@ -1,0 +1,13 @@
+- name: Ensure report directory exists
+  ansible.builtin.file:
+    path: "{{ report_output_dir }}"
+    state: directory
+    mode: "0755"
+  delegate_to: localhost
+
+- name: Generate infrastructure report
+  ansible.builtin.template:
+    src: report.txt.j2
+    dest: "{{ report_output_dir }}/{{ inventory_hostname }}.txt"
+    mode: "0644"
+  delegate_to: localhost
