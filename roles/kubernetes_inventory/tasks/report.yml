@@ -1,0 +1,13 @@
+---
+- name: Prepare Kubernetes inventory report data
+  ansible.builtin.set_fact:
+    kubernetes_report:
+      installed: "{{ kubernetes.installed }}"
+      distribution: "{{ kubernetes.distribution }}"
+      version: "{{ kubernetes.version | default('N/A') }}"
+      node_roles: "{{ kubernetes.node_roles | default([]) }}"
+      components: "{{ kubernetes.components | default([]) }}"
+
+- name: Show Kubernetes report data
+  ansible.builtin.debug:
+    var: kubernetes_report

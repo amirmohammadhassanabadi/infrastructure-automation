@@ -12,4 +12,6 @@
     - kubernetes.installed
     - "'control-plane' in kubernetes.node_roles"
 
-# - import_tasks: report.yml
+- import_tasks: report.yml
+  when:
+    - kubernetes.installed

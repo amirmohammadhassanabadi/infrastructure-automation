@@ -69,11 +69,3 @@
   when:
     - kubernetes.distribution == "RKE1"
     - item.stdout | trim != ""
-
-# ============================================================================
-# Show detected components
-# ============================================================================
-
-- name: Show Kubernetes components
-  ansible.builtin.debug:
-    var: kubernetes

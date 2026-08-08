@@ -70,7 +70,3 @@
   when:
     - kubernetes.distribution == "RKE1"
     - rke1_api_server.stdout | trim == ""
-
-- name: Show Kubernetes version
-  ansible.builtin.debug:
-    var: kubernetes
