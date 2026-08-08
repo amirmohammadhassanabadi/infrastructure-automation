@@ -10,7 +10,7 @@
       distribution: "Not Installed"
       version: ""
       raw_version: ""
-      node_role: ""
+      node_roles: []
       components: []
 
 # ============================================================================

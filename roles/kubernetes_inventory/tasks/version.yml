@@ -36,7 +36,3 @@
   when:
     - version_cmd is defined
     - version_cmd.rc == 0
-
-- name: Show Kubernetes version
-  ansible.builtin.debug:
-    var: kubernetes

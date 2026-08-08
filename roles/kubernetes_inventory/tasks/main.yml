@@ -4,12 +4,12 @@
 - import_tasks: version.yml
   when: kubernetes.installed
 
-# - import_tasks: node_role.yml
-#   when: kubernetes.installed
+- import_tasks: node_role.yml
+  when: kubernetes.installed
 
 # - import_tasks: components.yml
 #   when:
 #     - kubernetes.installed
-#     - kubernetes_role == "Control Plane"
+#     - "'control-plane' in kubernetes.node_roles"
 
 # - import_tasks: report.yml

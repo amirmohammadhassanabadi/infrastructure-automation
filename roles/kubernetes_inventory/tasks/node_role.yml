@@ -1,0 +1,76 @@
+---
+# ============================================================================
+# RKE2 node roles
+# ============================================================================
+
+- name: Detect RKE2 control-plane role
+  ansible.builtin.set_fact:
+    kubernetes: >-
+      {{
+        kubernetes | combine({
+          'node_roles': kubernetes.node_roles + ['control-plane']
+        })
+      }}
+  when:
+    - kubernetes.distribution == "RKE2"
+    - "'rke2-server.service' in ansible_facts.services"
+
+- name: Detect RKE2 worker role
+  ansible.builtin.set_fact:
+    kubernetes: >-
+      {{
+        kubernetes | combine({
+          'node_roles': kubernetes.node_roles + ['worker']
+        })
+      }}
+  when:
+    - kubernetes.distribution == "RKE2"
+    - "'rke2-agent.service' in ansible_facts.services"
+
+
+# ============================================================================
+# RKE1 node roles
+# ============================================================================
+
+- name: Check RKE1 control-plane containers
+  ansible.builtin.command:
+    argv:
+      - docker
+      - ps
+      - --filter
+      - name=kube-apiserver
+      - --format
+      - "{{ '{{.Names}}' }}"
+  register: rke1_api_server
+  changed_when: false
+  failed_when: false
+  when:
+    - kubernetes.distribution == "RKE1"
+
+- name: Detect RKE1 control-plane role
+  ansible.builtin.set_fact:
+    kubernetes: >-
+      {{
+        kubernetes | combine({
+          'node_roles': kubernetes.node_roles + ['control-plane']
+        })
+      }}
+  when:
+    - kubernetes.distribution == "RKE1"
+    - rke1_api_server.stdout | trim != ""
+
+- name: Detect RKE1 worker role
+  ansible.builtin.set_fact:
+    kubernetes: >-
+      {{
+        kubernetes | combine({
+          'node_roles': kubernetes.node_roles + ['worker']
+        })
+      }}
+  when:
+    - kubernetes.distribution == "RKE1"
+    - rke1_api_server.stdout | trim == ""
+
+- name: Show Kubernetes version
+  ansible.builtin.debug:
+    var: kubernetes
