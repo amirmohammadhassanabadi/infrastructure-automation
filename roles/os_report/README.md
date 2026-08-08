@@ -1,38 +1,48 @@
-os-reporter
-=========
+# OS Reporter
 
-A brief description of the role goes here.
+An Ansible role for collecting operating-system, hardware, storage, and network information from Linux hosts.
 
-Requirements
-------------
+## Responsibilities
 
-Any pre-requisites that may not be covered by Ansible itself or the role should be mentioned here. For instance, if the role uses the EC2 module, it may be a good idea to mention in this section that the boto package is required.
+The role collects:
 
-Role Variables
---------------
+* Hostname
+* FQDN
+* Operating system
+* Kernel version
+* CPU information
+* Memory
+* Swap
+* Mounted filesystems
+* Network interfaces
+* IPv4 addresses
+* IPv6 addresses
 
-A description of the settable variables for this role should go here, including any variables that are in defaults/main.yml, vars/main.yml, and any variables that can/should be set via parameters to the role. Any variables that are read from other roles and/or the global scope (ie. hostvars, group vars, etc.) should be mentioned here as well.
+## Role Structure
 
-Dependencies
-------------
+```text
+os-reporter/
+├── tasks/
+│   ├── main.yml
+│   ├── collect.yml
+│   └── report.yml
+├── templates/
+│   └── report.txt.j2
+└── README.md
+```
 
-A list of other roles hosted on Galaxy should go here, plus any details in regards to parameters that may need to be set for other roles, or variables that are used from other roles.
+## Usage
 
-Example Playbook
-----------------
+Include the role in a playbook:
 
-Including an example of how to use your role (for instance, with variables passed in as parameters) is always nice for users too:
+```yaml
+- hosts: linux
+  roles:
+    - os-reporter
+```
 
-    - hosts: servers
-      roles:
-         - { role: username.rolename, x: 42 }
+The collected information is made available to the report generation stage.
 
-License
--------
+## Notes
 
-BSD
-
-Author Information
-------------------
-
-An optional section for the role authors to include contact information, or a website (HTML is not allowed).
+The role is designed to collect infrastructure information rather than modify the managed systems.

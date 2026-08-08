@@ -207,7 +207,7 @@ This project follows several principles:
 
 ## Project Status
 
-This project is under active development.
+🚧 This project is under active development.
 
 Current focus:
 
@@ -217,5 +217,3 @@ Current focus:
 * Cisco configuration backup automation
 
 Future improvements will include additional infrastructure checks, improved validation, additional report formats, and broader platform support.
-
-🚧 This project is under active development.
