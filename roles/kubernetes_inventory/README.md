@@ -1,38 +1,90 @@
-Role Name
-=========
+# Kubernetes Inventory
 
-A brief description of the role goes here.
+An Ansible role for detecting and collecting Kubernetes information directly from managed Kubernetes nodes.
 
-Requirements
-------------
+## Responsibilities
 
-Any pre-requisites that may not be covered by Ansible itself or the role should be mentioned here. For instance, if the role uses the EC2 module, it may be a good idea to mention in this section that the boto package is required.
+The role currently detects:
 
-Role Variables
---------------
+* Whether Kubernetes is installed.
+* Kubernetes distribution.
+* Kubernetes version.
+* Kubernetes node roles.
+* Kubernetes control-plane components.
 
-A description of the settable variables for this role should go here, including any variables that are in defaults/main.yml, vars/main.yml, and any variables that can/should be set via parameters to the role. Any variables that are read from other roles and/or the global scope (ie. hostvars, group vars, etc.) should be mentioned here as well.
+## Supported Distributions
 
-Dependencies
-------------
+Currently supported:
 
-A list of other roles hosted on Galaxy should go here, plus any details in regards to parameters that may need to be set for other roles, or variables that are used from other roles.
+* RKE1
+* RKE2
 
-Example Playbook
-----------------
+## Detection Approach
 
-Including an example of how to use your role (for instance, with variables passed in as parameters) is always nice for users too:
+The role intentionally performs node-local detection.
 
-    - hosts: servers
-      roles:
-         - { role: username.rolename, x: 42 }
+It does not require:
 
-License
--------
+* `kubectl`
+* A kubeconfig file
+* Access to the Kubernetes API
 
-BSD
+### RKE2
 
-Author Information
-------------------
+RKE2 is detected using the RKE2 binary and systemd services.
 
-An optional section for the role authors to include contact information, or a website (HTML is not allowed).
+Version information is collected using the RKE2 binary.
+
+### RKE1
+
+RKE1 is detected using Docker-based Kubernetes components.
+
+The Kubernetes version is collected from the kubelet Docker container.
+
+## Collected Data
+
+The role stores Kubernetes information in a structured dictionary:
+
+```yaml
+kubernetes:
+  installed: true
+  distribution: RKE1
+  version: v1.x.x
+  raw_version: ...
+  node_roles:
+    - control-plane
+    - worker
+  components:
+    - kube-apiserver
+    - kube-controller-manager
+    - kube-scheduler
+    - etcd
+```
+
+## Role Structure
+
+```text
+kubernetes_inventory/
+├── tasks/
+│   ├── main.yml
+│   ├── detect.yml
+│   ├── version.yml
+│   ├── node_role.yml
+│   ├── components.yml
+│   └── report.yml
+└── README.md
+```
+
+## Usage
+
+```yaml
+- hosts: kubernetes
+  roles:
+    - kubernetes_inventory
+```
+
+## Current Limitations
+
+The role currently focuses on RKE1 and RKE2.
+
+Additional Kubernetes distributions and deeper cluster-level inventory may be added in future versions.
