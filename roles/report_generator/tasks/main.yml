@@ -8,6 +8,6 @@
 - name: Generate infrastructure report
   ansible.builtin.template:
     src: report.txt.j2
-    dest: "{{ report_output_dir }}/{{ inventory_hostname }}.txt"
     mode: "0644"
+    dest: "{{ report_output_dir }}/{{ inventory_hostname }}_{{ ansible_date_time.date }}_{{ ansible_date_time.time }}.txt"
   delegate_to: localhost

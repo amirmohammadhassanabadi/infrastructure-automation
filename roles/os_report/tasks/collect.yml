@@ -35,9 +35,9 @@
     network_interfaces: "{{ network_interfaces + [interface_info] }}"
   loop: "{{ ansible_facts.interfaces }}"
   vars:
-    iface: "{{ ansible_facts[item] }}"
+    iface: "{{ ansible_facts[item] | default({}) }}"
     interface_info:
-      name: "{{ iface.device }}"
+      name: "{{ iface.device | default(item) }}"
       active: "{{ iface.active | default(false) }}"
       type: "{{ iface.type | default('unknown') }}"
       mtu: "{{ iface.mtu | default('N/A') }}"
